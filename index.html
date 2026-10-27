@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tempest AI</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #0b1020;
+  color: #edf2ff;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  padding: 22px 7%;
+  border-bottom: 1px solid #273047;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #a5b4fc;
+}
+
+.tag {
+  font-size: 12px;
+  color: #a5b4fc;
+  border: 1px solid #454b72;
+  padding: 7px 10px;
+  border-radius: 20px;
+}
+
+main {
+  max-width: 900px;
+  margin: 48px auto;
+  padding: 0 20px;
+}
+
+h1 {
+  font-size: clamp(30px, 6vw, 48px);
+  margin-bottom: 12px;
+}
+
+p {
+  color: #a8b3cc;
+  line-height: 1.6;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.card {
+  background: #151d31;
+  border: 1px solid #293650;
+  border-radius: 14px;
+  padding: 18px;
+  color: #edf2ff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.card:hover,
+.card.active {
+  border-color: #929cff;
+  background: #202943;
+}
+
+.card span {
+  display: block;
+  font-size: 25px;
+  margin-bottom: 12px;
+}
+
+.card small {
+  display: block;
+  color: #a8b3cc;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.panel {
+  background: #151d31;
+  border: 1px solid #293650;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+label {
+  display: block;
+  margin: 14px 0 10px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  background: #0b1020;
+  color: white;
+  border: 1px solid #35425d;
+  border-radius: 10px;
+  padding: 14px;
+  font: inherit;
+}
+
+button.primary {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  background: #818cf8;
+  color: #101326;
+  font-weight: bold;
+  border: 0;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#answer {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  margin-top: 18px;
+  color: #e0e7ff;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  text-align: center;
+  color: #7d8ba8;
+  padding: 30px 15px;
+  font-size: 12px;
+}
+
+@media (max-width: 420px) {
+  main { margin-top: 30px; }
+  .cards { gap: 8px; }
+  .card { padding: 13px; font-size: 14px; }
+  .panel { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">✦ Tempest AI</div>
+  <div class="tag">PORTFÓLIO • V1.0</div>
+</header>
+
+<main>
+  <p>INTELIGÊNCIA CRIATIVA, EM UM SÓ LUGAR</p>
+  <h1>Suas ideias começam aqui.</h1>
+  <p>Escolha uma ferramenta, escreva o que precisa e experimente
+  seu próprio espaço de produtividade.</p>
+
+  <div class="cards">
+    <button class="card active" data-tool="texto">
+      <span>✍️</span>
+      <b>Criador de textos</b>
+      <small>Mensagens, legendas e descrições.</small>
+    </button>
+
+    <button class="card" data-tool="ideias">
+      <span>💡</span>
+      <b>Gerador de ideias</b>
+      <small>Novas ideias para projetos e negócios.</small>
+    </button>
+
+    <button class="card" data-tool="atendimento">
+      <span>💬</span>
+      <b>Bot de atendimento</b>
+      <small>Respostas para clientes.</small>
+    </button>
+
+    <button class="card" data-tool="estudo">
+      <span>📚</span>
+      <b>Assistente de estudos</b>
+      <small>Organize seus estudos e tarefas.</small>
+    </button>
+  </div>
+
+  <section class="panel">
+    <h2 id="toolTitle">Criador de textos</h2>
+    <p id="toolDesc">Descreva o texto que você quer preparar.</p>
+
+    <label for="prompt">O que você precisa?</label>
+    <textarea id="prompt"
+      placeholder="Ex.: escreva uma apresentação profissional para meu portfólio..."></textarea>
+
+    <button class="primary" id="generate">Gerar resposta →</button>
+    <div id="answer" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer>Tempest AI · Projeto experimental de portfólio</footer>
+
+<script>
+const tools = {
+  texto: {
+    title: "Criador de textos",
+    desc: "Descreva o texto que você quer preparar."
+  },
+  ideias: {
+    title: "Gerador de ideias",
+    desc: "Conte seu objetivo e explore possibilidades."
+  },
+  atendimento: {
+    title: "Bot de atendimento",
+    desc: "Simule uma resposta para um cliente."
+  },
+  estudo: {
+    title: "Assistente de estudos",
+    desc: "Diga o assunto que você quer organizar."
+  }
+};
+
+let selected = "texto";
+
+document.querySelectorAll(".card").forEach(card => {
+  card.addEventListener("click", () => {
+    selected = card.dataset.tool;
+
+    document.querySelectorAll(".card").forEach(c => {
+      c.classList.toggle("active", c === card);
+    });
+
+    document.getElementById("toolTitle").textContent =
+      tools[selected].title;
+
+    document.getElementById("toolDesc").textContent =
+      tools[selected].desc;
+
+    document.getElementById("answer").textContent = "";
+  });
+});
+
+document.getElementById("generate").addEventListener("click", () => {
+  const input = document.getElementById("prompt").value.trim();
+  const answer = document.getElementById("answer");
+
+  if (!input) {
+    answer.textContent = "Escreva sua ideia no campo acima primeiro.";
+    return;
+  }
+
+  const replies = {
+    texto:
+      "RASCUNHO DE TEXTO\n\nOlá! Aqui está uma estrutura inicial para desenvolver sua ideia: \"" +
+      input +
+      "\".\n\nComece apresentando o objetivo, explique os principais detalhes e termine com uma mensagem clara. Revise o resultado antes de utilizá-lo.",
+
+    ideias:
+      "IDEIAS PARA EXPLORAR\n\nSeu ponto de partida: " +
+      input +
+      "\n\n1. Crie uma versão simples para testar.\n2. Descubra o que seu público precisa.\n3. Desenvolva uma solução diferente.\n4. Peça opiniões e melhore a ideia.",
+
+    atendimento:
+      "SIMULAÇÃO DE ATENDIMENTO\n\nOlá! Tudo bem?\n\nObrigado por entrar em contato! Recebemos sua mensagem sobre \"" +
+      input +
+      "\". Vamos verificar as informações e orientar você sobre os próximos passos.\n\nEsta é uma resposta demonstrativa que deve ser adaptada ao caso real.",
+
+    estudo:
+      "PLANO DE ESTUDOS\n\nTema: " +
+      input +
+      "\n\n1. Separe 20 minutos para estudar o conteúdo.\n2. Anote os pontos principais.\n3. Faça cinco perguntas sobre o assunto.\n4. Revise o que aprendeu."
+  };
+
+  answer.textContent = replies[selected];
+});
+</script>
+</body>
+</html>
